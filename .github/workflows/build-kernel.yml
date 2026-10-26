@@ -184,7 +184,18 @@ jobs:
         with:
           key: kernel-${{ env.DEVICE }}-${{ env.KSU_VARIANT }}-${{ env.KERNEL_VERSION }}
           max-size: 2G
+          
+      - name: Fix Realme missing Kconfig
+        run: |
+          cd "$WORKSPACE/android-kernel"
+          rm -rf kernel/sched_assist kernel/tuning
+          mkdir -p kernel/sched_assist kernel/tuning
+          touch kernel/sched_assist/Kconfig kernel/tuning/Kconfig
+          sed -i 's|source "kernel/sched_assist/Kconfig"|# source "kernel/sched_assist/Kconfig"|' init/Kconfig
+          sed -i 's|source "kernel/tuning/Kconfig"|# source "kernel/tuning/Kconfig"|' init/Kconfig
 
+      - name: Build kernel
+        run: bash scripts/build.sh all
       - name: Build kernel
         run: bash scripts/build.sh all
 
